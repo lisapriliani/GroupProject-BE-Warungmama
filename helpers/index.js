@@ -6,13 +6,9 @@ const generateToken = (data) => {
     return token;
 }
 const verifyToken = (req,res,next)=>{
-    const token = req.headers.authorization
-    
-
     try {
+        const token = req.headers.authorization
         const verify = jwt.verify(token.split(" ")[1], process.env.secretkey);
-        req.user = verify;
-        console.log(verify)
         if(verify){
             next()
         }
@@ -20,8 +16,7 @@ const verifyToken = (req,res,next)=>{
         return res.status(401).send({
             error: error
         });
-    }
-    
+    }   
 }
 module.exports = {
     generateToken : generateToken,
