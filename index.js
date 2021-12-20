@@ -5,6 +5,7 @@ const cors = require('cors')
 const DBconnection = require("./config/")
 require('dotenv').config()
 const {uri} = process.env
+const router = require("./router")
 
 async function main() {
     try {
@@ -14,6 +15,7 @@ async function main() {
         app.use(bodyparser.json())
         app.use(bodyparser.urlencoded({extended: false}))
         app.use(cors())
+        app.use(router)
         app.listen(port, ()=>{
             console.log(`listening on http://localhost:${port}`)
         })
