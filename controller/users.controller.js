@@ -7,11 +7,11 @@ class UsersController {
     static async registerUser(req, res) {
         
         try {
-            let {nama, email, password, historyId, wishlistId, keranjangId} = req.body
+            let {nama, email, password} = req.body
             const emailExist = await UsersModel.findOne({email: email})
             if (emailExist === null){
                 password = bcrypt.hashSync(password, saltRounds)
-                const users = new UsersModel({nama: nama, email: email, password: password, historyId: historyId, wishlistId: wishlistId, keranjangId: keranjangId})
+                const users = new UsersModel({nama: nama, email: email, password: password})
                 const saved = await users.save()
                 res.status(201).send(saved);
             }else{
@@ -46,8 +46,7 @@ class UsersController {
         try {
             const id = req.params.id
             const existUser = await UsersModel.findOne({_id: id})
-            res.send(existUser)
-              
+            res.send(existUser)   
         } catch (error) {
             res.status(500).send({err: error})
         }
