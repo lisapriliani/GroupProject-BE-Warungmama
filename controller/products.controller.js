@@ -22,13 +22,18 @@ exports.getByID = async (req, res) => {
 
 exports.add = async (req, res) => {
   try {
+    /* const role = req.role
+    
+    if(role !== 'admin' || role !== 'superadmin') {
+      return res.sendStatus(403)
+    } */
+    
     const newProduct = req.body
     const product = new ProductModel(newProduct)
-    const saved = await product.save()
-
+    await product.save()
+    
     res.status(201).json({
-      message: "OK",
-      product: saved
+      message: "Product added successfully"
     })
   } catch (error) {
     res.send({message: error})
@@ -37,11 +42,17 @@ exports.add = async (req, res) => {
 
 exports.update = async (req, res) => {
   try {
+    /* const role = req.role
+
+    if(role !== 'admin' || role !== 'superadmin') {
+      return res.sendStatus(403)
+    } */
+    
     const ID = req.params.id
     const updateProduct = req.body
-
+    
     await ProductModel.updateOne({_id: ID}, updateProduct)
-
+    
     res.send({message: "Product Updated"})
   } catch (error) {
     res.send({message: error})
@@ -50,6 +61,11 @@ exports.update = async (req, res) => {
 
 exports.delete = async (req, res) => {
   try {
+    /* const role = req.role
+    
+    if(role !== 'admin' || role !== 'superadmin') {
+      return res.sendStatus(403)
+    } */
     const ID = req.params.id
 
     await ProductModel.deleteOne({_id: ID})

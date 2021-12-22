@@ -6,13 +6,16 @@ const opts = {
 
 const ProductSchema = new mongoose.Schema({
   nama: {
-    type: String
+    type: String,
+    required: true
   },
   tipe: {
-    type: String
+    type: String,
+    required: true
   },
   stok: {
-    type: Number
+    type: Number,
+    required: true
   },
   deskripsi: {
     type: String
@@ -21,11 +24,14 @@ const ProductSchema = new mongoose.Schema({
     type: Array
   },
   harga: {
-    type: Number
+    type: Number,
+    required: true
   },
-  reviewID: {
-    type: mongoose.ObjectId
-  }
+  reviewID: [{
+    type: mongoose.Types.ObjectId,
+    default: []
+    // ref: 'Reviews'
+  }]
 }, opts)
 
 module.exports = mongoose.model("Products", ProductSchema)
