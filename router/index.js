@@ -1,11 +1,15 @@
 const express = require("express")
-// const testRoutes = require("./test")
-const router = express.Router()
 
+const userRoutes = require("./users")
+const adminRoutes = require("./admin")
 const productsRouter = require("./products")
 const cartRouter = require("./cart")
 
-// router.use("/", testRoutes)
+const router = express.Router()
+router.use("/users", userRoutes)
+router.use("/admin", adminRoutes)
+
+
 router.use("/products", productsRouter)
 router.use("/cart", cartRouter)
 

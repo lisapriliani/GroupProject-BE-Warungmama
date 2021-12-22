@@ -36,7 +36,6 @@ const verifyTokenWithId = (req,res,next)=>{
         const id = req.params.id
         const verify = jwt.verify(token.split(" ")[1], secretkey);
         if(verify.data._id === id){
-            res.send({data: verify, id: id})
             next()
         }else{
             res.status(404).send('forbidden')

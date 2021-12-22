@@ -3,12 +3,13 @@ const express = require("express")
 const router = express.Router()
 
 const CartController = require("../controller/cart.controller")
+const { verifyToken } = require("../helpers")
 
-router.get("/", CartController.getAll)
-router.get("/:userID", CartController.getCartByUser)
-router.post("/", CartController.addCart)
-router.put("/reduceQty/:productID", CartController.reduceQty)
-router.delete("/", CartController.emptyCart)
-router.delete("/removeItem/:productID", CartController.removeItem)
+router.get("/", verifyToken, CartController.getAll)
+router.get("/:userID", verifyToken, CartController.getCartByUser)
+router.post("/", verifyToken, CartController.addCart)
+router.put("/reduceQty/:productID", verifyToken, CartController.reduceQty)
+router.delete("/", verifyToken, CartController.emptyCart)
+router.delete("/removeItem/:productID", verifyToken, CartController.removeItem)
 
 module.exports = router
