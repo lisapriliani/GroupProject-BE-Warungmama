@@ -15,9 +15,11 @@ class wishlistcontroller {
   }
   static async postWishlist(req, res) {
     try {
+      const data = dataToken(req, res);
       const { productID } = req.body;
       const wishlist = new WishlistModel({
         productID: productID,
+        userID: data.data._id,
       });
       const save = await wishlist.save();
       res.send(save);

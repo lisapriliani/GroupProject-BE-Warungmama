@@ -6,7 +6,7 @@ const DBconnection = require("./config/");
 require("dotenv").config();
 const { uri } = process.env;
 const routes = require("./router");
-const port = 3000;
+const port = 5000;
 
 async function main() {
   try {
