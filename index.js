@@ -3,8 +3,10 @@ const bcrypt = require ('bcrypt')
 const bodyparser = require('body-parser')
 const cors = require('cors')
 const DBconnection = require("./config/")
+const routes = require("./router")
 require('dotenv').config()
 const {uri} = process.env
+
 
 async function main() {
     try {
@@ -14,6 +16,7 @@ async function main() {
         app.use(bodyparser.json())
         app.use(bodyparser.urlencoded({extended: false}))
         app.use(cors())
+        app.use(routes)
         app.listen(port, ()=>{
             console.log(`listening on http://localhost:${port}`)
         })

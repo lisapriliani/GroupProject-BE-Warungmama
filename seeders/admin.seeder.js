@@ -1,11 +1,9 @@
 const AdminModel = require("../models/admin.model");
-const mongoose = require("mongoose");
 const bcrypt = require("bcrypt")
 const DBconnection = require("../config/index")
-require('dotenv').config({ path: '../.env' })
+require('dotenv').config({ path: './.env' })
 const {uri} = process.env
 const saltRounds = 10
-
 
 const AdminData = [   
   new AdminModel({
