@@ -1,7 +1,8 @@
 const mongoose = require("mongoose")
 
 const opts = {
-  timestamps: true
+  timestamps: true,
+  versionKey: false
 }
 
 const ProductSchema = new mongoose.Schema({

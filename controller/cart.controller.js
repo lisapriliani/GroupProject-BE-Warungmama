@@ -1,5 +1,7 @@
 
+const { dataToken } = require("../helpers")
 const CartModel = require("../models/cart.model")
+const UserModel = require("../models/users.model")
 
 /* exports.getAll = async (req, res) => {
   try {
@@ -8,9 +10,9 @@ const CartModel = require("../models/cart.model")
     const cart = await CartModel.find({userID: owner}).populate("produk")
     if(cart){
       // hitung total price per item
-
+      
       // hitung total price all item
-
+      
       res.send({cart: cart})
     } else {
       res.send({message: "You don't have product on your cart, let's go shopping"})
@@ -22,30 +24,32 @@ const CartModel = require("../models/cart.model")
 } */
 
 exports.getAll = async (req, res) => {
-  try {
-    // const role = req.role
-    
-    // if(role === 'admin' || role === 'superadmin') {
-      
-    // } else {
-    //   const userID = req.user._id
+  const {data} = dataToken(req, res)
 
-    //   const cart = await CartModel.findOne({userID: userID}).populate({
-    //     path: "produk",
-    //     populate: {
-    //       path: "productID"
-    //     }
-    //   })
-    //   res.send({cart: cart})
-    // }
+  try {
+    const role = req.role || null
     
-    const cart = await CartModel.find().populate({
-      path: "produk",
-      populate: {
-        path: "productID"
-      }
-    })
-    res.send({cart: cart})
+    if(role === 'admin' || role === 'superadmin') {
+      const cart = await CartModel.find().populate({
+        path: "produk",
+        populate: {
+          path: "productID"
+        }
+      })
+      res.send({cart: cart})
+    } else {
+      const userID = data._id
+
+      const cart = await CartModel.findOne({userID: userID}).populate({
+        path: "produk",
+        populate: {
+          path: "productID"
+        }
+      })
+
+      res.send({cart: cart})
+    }
+    
   } catch (error) {
     res.status(500).send({message: error})
   }
@@ -55,11 +59,11 @@ exports.getAll = async (req, res) => {
 // only admin
 exports.getCartByUser = async (req, res) => {
   try {
-    /* const role = req.role
+    // const role = req.role || null
     
-    if(role !== 'admin' || role !== 'superadmin') {
-      return res.sendStatus(403)
-    } */
+    // if(role !== 'admin' || role !== 'superadmin') {
+    //   return res.sendStatus(403)
+    // }
 
     const userID = req.params.userID
     const cart = await CartModel.findOne({userID: userID}).populate({
@@ -78,9 +82,11 @@ exports.getCartByUser = async (req, res) => {
 }
 
 exports.addCart = async (req, res) => {
+  const {data} = dataToken(req, res)
+
   try {
     // const userID = req.user._id
-    const userID = "61c308bc4f4610959f93bc2b"
+    const userID = data._id
     const {productID} = req.body
 
     let cart = await CartModel.findOne({userID: userID})
@@ -106,6 +112,7 @@ exports.addCart = async (req, res) => {
       })
       
       const saved = await newCart.save()
+      await UserModel.findByIdAndUpdate(userID, {keranjangId: saved._id})
       res.json({
         message: "Product added to cart succesfully",
         saved: saved
@@ -118,8 +125,10 @@ exports.addCart = async (req, res) => {
 
 // mengurangi product quantity in cart
 exports.reduceQty = async (req, res) => {
+  const {data} = dataToken(req, res)
+
   try {
-    const userID = "61c308bc4f4610959f93bc2b"
+    const userID = data._id
     const {productID} = req.params
     
     let cart = await CartModel.findOne({userID: userID})
@@ -147,8 +156,10 @@ exports.reduceQty = async (req, res) => {
 
 // menghapus semua produk pada cart
 exports.emptyCart = async (req, res) => {
+  const {data} = dataToken(req, res)
+  
   try {
-    const userID = "61c308bc4f4610959f93bc2b"
+    const userID = data._id
     let cart = await CartModel.findOne({userID: userID})
     cart.produk = []
     await cart.save()
@@ -160,7 +171,8 @@ exports.emptyCart = async (req, res) => {
 
 // menghapus product dari cart
 exports.removeItem = async (req, res) => {
-  const userID = "61c308bc4f4610959f93bc2b"
+  const {data} = dataToken(req, res)
+  const userID = data._id
   const {productID} = req.params
   
   try {
@@ -179,5 +191,13 @@ exports.removeItem = async (req, res) => {
 }
 
 exports.checkout = async (req, res) => {
-  
+  const {data} = dataToken(req, res)
+  const userID = data._id
+
+  const {selectedProducts} = req.body
+
+  let cart = await CartModel.findOne({userID: userID})
+  let checkoutProducts = selectedProducts.map(select => cart.produk.filter(p => p.productID == select))
+
+  res.send(checkoutProducts)
 }
