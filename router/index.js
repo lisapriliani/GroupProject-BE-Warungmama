@@ -1,7 +1,11 @@
 const express = require("express")
-const testRoutes = require("./test")
-const router = express.Router()
+const userRoutes = require("./users")
+const adminRoutes = require("./admin")
 
-router.use("/", testRoutes)
+// const app = express()
+const router = express.Router()
+router.use("/users", userRoutes)
+router.use("/admin", adminRoutes)
+
 
 module.exports = router
