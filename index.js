@@ -3,10 +3,9 @@ const bcrypt = require("bcrypt");
 const bodyparser = require("body-parser");
 const cors = require("cors");
 const DBconnection = require("./config/");
+const routes = require("./router");
 require("dotenv").config();
 const { uri } = process.env;
-const routes = require("./router");
-const port = 5000;
 
 async function main() {
   try {
