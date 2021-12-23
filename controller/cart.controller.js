@@ -3,33 +3,13 @@ const { dataToken } = require("../helpers")
 const CartModel = require("../models/cart.model")
 const UserModel = require("../models/users.model")
 
-/* exports.getAll = async (req, res) => {
-  try {
-    // get id usernya dari session untuk mengambil keranjang yang hanya dimiliki user tersebut
-    const owner = req.user._id
-    const cart = await CartModel.find({userID: owner}).populate("produk")
-    if(cart){
-      // hitung total price per item
-      
-      // hitung total price all item
-      
-      res.send({cart: cart})
-    } else {
-      res.send({message: "You don't have product on your cart, let's go shopping"})
-    }
-  } catch (error) {
-    res.send({message: error})
-  }
-  
-} */
-
 exports.getAll = async (req, res) => {
   const {data} = dataToken(req, res)
 
   try {
-    const role = req.role || null
+    const role = data.role || null
     
-    if(role === 'admin' || role === 'superadmin') {
+    if(role === 'admin') {
       const cart = await CartModel.find().populate({
         path: "produk",
         populate: {
@@ -59,11 +39,6 @@ exports.getAll = async (req, res) => {
 // only admin
 exports.getCartByUser = async (req, res) => {
   try {
-    // const role = req.role || null
-    
-    // if(role !== 'admin' || role !== 'superadmin') {
-    //   return res.sendStatus(403)
-    // }
 
     const userID = req.params.userID
     const cart = await CartModel.findOne({userID: userID}).populate({
@@ -85,7 +60,6 @@ exports.addCart = async (req, res) => {
   const {data} = dataToken(req, res)
 
   try {
-    // const userID = req.user._id
     const userID = data._id
     const {productID} = req.body
 
