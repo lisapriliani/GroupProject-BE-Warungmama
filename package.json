@@ -4,7 +4,7 @@
   "description": "This repository is for Group Project Back End",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js",
+    "start": "node index.js",
     "seed": "node seeders/admin.seeder.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
