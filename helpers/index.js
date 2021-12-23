@@ -15,11 +15,11 @@ const verifyToken = (req,res,next)=>{
         if(verify){
             next()
         }else{
-            res.send('invalid token')
+            res.status(500).send('invalid token')
             res.end()
         }
     } catch (error) {
-        res.send('error')
+        res.status(500).send('error')
         res.end()
     }   
 }
@@ -41,12 +41,12 @@ const verifyTokenWithId = (req,res,next)=>{
             res.send({data: verify, id: id})
             next()
         }else{
-            res.send('forbidden')
+            res.status(500).send('forbidden')
             res.end()
 
         }
     } catch(error){
-        res.send(error)
+        res.status(500).send(error)
         res.end()
     }   
 }
@@ -57,11 +57,11 @@ const allowedAdmin = (req,res,next)=>{
         if(verify.data.role === "admin"){
             next()
         }else{
-            res.send('forbidden user')
+            res.status(500).send('forbidden user')
             res.end()
         }
     } catch (error) {
-        res.send(error)
+        res.status(500).send(error)
         res.end()
     }
 }
@@ -73,11 +73,11 @@ const allowedUser = (req,res,next)=>{
         if(verify.data.role === "user"){
             next()
         }else{
-            res.send('forbidden admin')
+            res.status(500).send('forbidden admin')
             res.end()
         }
     } catch (error) {
-        res.send(error)
+        res.status(500).send(error)
         res.end()
     }
 }
