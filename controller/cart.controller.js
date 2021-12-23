@@ -1,6 +1,7 @@
 
 const { dataToken } = require("../helpers")
 const CartModel = require("../models/cart.model")
+const HistoryModel = require("../models/history.model")
 const TransactionModel = require("../models/transaction.model")
 const UserModel = require("../models/users.model")
 
@@ -168,7 +169,7 @@ exports.checkout = async (req, res) => {
   const {data} = dataToken(req, res)
   const userID = data._id
 
-  const {selectedProducts, alamat, metodePengambilan} = req.body
+  const {selectedProducts, alamat, metodePengambilan, metodePembayaran} = req.body
 
   let cart = await CartModel.findOne({userID: userID}).populate({
     path: "produk",
@@ -207,8 +208,10 @@ exports.checkout = async (req, res) => {
     alamat: alamat || null,
     metodePengambilan: metodePengambilan,
     totalOngkir: totalOngkir,
-    totalPrice: totalPrice
+    totalPrice: totalPrice,
+    metodePembayaran: metodePembayaran
   }
+
   let saved = null
   const transactionCollection = await TransactionModel.findOne({keranjangID: cart._id})
   if(transactionCollection){
@@ -237,11 +240,25 @@ exports.order = async (req, res) => {
     cart = cart.produk.filter(p => {
       return deleteProduct.find(element => element != p.productID)
     })
-    await CartModel.findOne({userID: data._id}).updateOne({produk: cart})
 
+    let statusPembayaran = transaction.metodePembayaran === 'COD' ? 'Belum bayar' : 'Sudah bayar'
+
+    const order = {
+      userId: data._id,
+      produk: transaction.produk,
+      alamat: transaction.alamat,
+      metodePembayaran: transaction.metodePembayaran,
+      statusPembayaran: statusPembayaran,
+      metodePengambilan: transaction.metodePengambilan
+    }
+
+    const saved = await new HistoryModel(order).save()
+    await CartModel.findOne({userID: data._id}).updateOne({produk: cart})
+    await TransactionModel.deleteOne({_id: transaction._id})
+    
+    res.send(saved)
   } else {
     return res.sendStatus(400)
   }
   
-  res.send({cart, transaction, deleteProduct})
 }

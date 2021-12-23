@@ -18,6 +18,10 @@ const TransactionSchema = new mongoose.Schema({
   produk: [ProdukSchema],
   alamat: String,
   metodePengambilan: String,
+  metodePembayaran:{
+    type: String,
+    enum: ["transfer", "COD"]
+  },
   totalOngkir: Number,
   totalPrice: Number
 }, {versionKey: false})

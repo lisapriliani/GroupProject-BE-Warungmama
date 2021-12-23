@@ -7,10 +7,25 @@ class HistoryController {
             const token = dataToken(req,res)
             if(token.data.role === 'user'){
                 const id = token.data._id
-                const existHistory = await HistoryModel.find({userId: id})
+                const existHistory = await HistoryModel.find({userId: id}).populate({
+                    path: "produk",
+                    populate: {
+                        path: "productID"
+                    }
+                })
                 res.send(existHistory)
             }else{
-                const existHistory = await HistoryModel.find()
+                const existHistory = await HistoryModel.find().populate([
+                    {
+                        path: "produk",
+                        populate: {
+                            path: "productID"
+                        }
+                    },
+                    {
+                        path: "userId"
+                    }
+                ])
                 res.send(existHistory)
             } 
         } catch (error) {
