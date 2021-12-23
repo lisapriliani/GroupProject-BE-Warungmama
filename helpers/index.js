@@ -15,10 +15,12 @@ const verifyToken = (req,res,next)=>{
         if(verify){
             next()
         }else{
-            console.log('token error')
+            res.send('invalid token')
+            res.end()
         }
     } catch (error) {
-        console.log(error)
+        res.send('error')
+        res.end()
     }   
 }
 const dataToken = (req,res)=>{
@@ -36,13 +38,16 @@ const verifyTokenWithId = (req,res,next)=>{
         const id = req.params.id
         const verify = jwt.verify(token.split(" ")[1], secretkey);
         if(verify.data._id === id){
+            res.send({data: verify, id: id})
             next()
         }else{
-            console.log('forbidden')
+            res.send('forbidden')
+            res.end()
 
         }
     } catch(error){
-        console.log(error)
+        res.send(error)
+        res.end()
     }   
 }
 const allowedAdmin = (req,res,next)=>{
@@ -52,10 +57,12 @@ const allowedAdmin = (req,res,next)=>{
         if(verify.data.role === "admin"){
             next()
         }else{
-            console.log('forbidden user')
+            res.send('forbidden user')
+            res.end()
         }
     } catch (error) {
-        console.log(error)
+        res.send(error)
+        res.end()
     }
 }
 
@@ -66,10 +73,12 @@ const allowedUser = (req,res,next)=>{
         if(verify.data.role === "user"){
             next()
         }else{
-            console.log('forbidden admin')
+            res.send('forbidden admin')
+            res.end()
         }
     } catch (error) {
-        console.log(error)
+        res.send(error)
+        res.end()
     }
 }
 
