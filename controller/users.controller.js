@@ -4,8 +4,7 @@ const saltRounds = 10
 const {generateToken, verifyToken} = require("../helpers")
 
 class UsersController { 
-    static async registerUser(req, res) {
-        
+    static async registerUser(req, res) {        
         try {
             let {nama, email, password} = req.body
             const emailExist = await UsersModel.findOne({email: email})
@@ -26,16 +25,20 @@ class UsersController {
         try {
             let {email, password} = req.body
             const existUser = await UsersModel.findOne({email: email})
-            console.log(existUser)
             if(existUser !== null){
                 let compare = bcrypt.compareSync(password, existUser.password)
-                console.log(compare)
                 if(compare){
-                    const createToken = generateToken(existUser)
+                    const tokenUser = {
+                        _id: existUser._id,
+                        role: "user"
+                    }
+                    const createToken = generateToken(tokenUser)
                     res.status(200).send({message: "welcome", token: createToken})
                 }else{
                     res.send('invalid')
                 }
+            }else{
+                res.send('user is not exist')
             }  
             
         } catch (error) {
@@ -60,13 +63,6 @@ class UsersController {
             const update = {nama: nama, email:email, password:password}
             await UsersModel.findOneAndUpdate(filter, update)
             res.status(200).send({message: "success"});
-        } catch (error) {
-            res.send(error)
-        }
-    }
-    static async testAuthor(req,res){
-        try {
-            
         } catch (error) {
             res.send(error)
         }
