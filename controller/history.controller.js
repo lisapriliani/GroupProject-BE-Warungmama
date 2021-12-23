@@ -37,19 +37,24 @@ class HistoryController {
             const token = dataToken(req,res)
             const idHistory = req.params.id
             const filter = {_id: idHistory}
-            let {status, tanggalDiterima} = req.body
+            let {statusPemesanan, statusPembayaran} = req.body
             const existHistory = await HistoryModel.findOne(filter)
-            if(existHistory!== "Diterima"){
+            if(existHistory.statusPemesanan !== "Diterima"){
                 if(token.data.role === 'admin'){
-                    if(status === "Diantar"){
-                        const editAdmin = await HistoryModel.findOneAndUpdate(filter, {status: status})
+                    if(statusPemesanan === "Diantar"){
+                        const editAdmin = await HistoryModel.findOneAndUpdate(filter, {statusPemesanan: statusPemesanan, statusPembayaran: statusPembayaran})
                         res.send('Status update success')
                     }else{
                         res.status(500).send('invalid status')
                     }
                 }else{
-                    if(status === "Diterima"){
-                        const editUser = await HistoryModel.findOneAndUpdate(filter, {status: status, tanggalDiterima: tanggalDiterima})
+                    if(statusPemesanan === "Diterima"){
+                        let today = new Date();
+                        let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+                        let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+                        let dateTime = date+' '+time;
+
+                        const editUser = await HistoryModel.findOneAndUpdate(filter, {statusPemesanan: statusPemesanan, tanggalDiterima: dateTime})
                         res.send('Status update success')
                     }else{
                         res.status(500).send('invalid status')

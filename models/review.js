@@ -8,7 +8,7 @@ const reviewSchema = new mongoose.Schema({
     },
   ],
   tanggal: {
-    type: Date,
+    type: String,
   },
   bintang: {
     type: Number,
@@ -20,6 +20,10 @@ const reviewSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectID,
     ref: "User",
   },
+  historyID: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "History"
+  }
 });
 const ReviewModel = mongoose.model("Review", reviewSchema);
 module.exports = ReviewModel;
