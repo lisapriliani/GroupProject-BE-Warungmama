@@ -4,8 +4,7 @@ const saltRounds = 10
 const {generateToken, verifyToken} = require("../helpers")
 
 class UsersController { 
-    static async registerUser(req, res) {
-        
+    static async registerUser(req, res) {        
         try {
             let {nama, email, password} = req.body
             const emailExist = await UsersModel.findOne({email: email})
@@ -38,6 +37,8 @@ class UsersController {
                 }else{
                     res.send('invalid')
                 }
+            }else{
+                res.send('user is not exist')
             }  
             
         } catch (error) {
@@ -62,13 +63,6 @@ class UsersController {
             const update = {nama: nama, email:email, password:password}
             await UsersModel.findOneAndUpdate(filter, update)
             res.status(200).send({message: "success"});
-        } catch (error) {
-            res.send(error)
-        }
-    }
-    static async testAuthor(req,res){
-        try {
-            
         } catch (error) {
             res.send(error)
         }

@@ -10,6 +10,7 @@ const {verifyToken, verifyTokenWithId, allowedAdmin} = require("../helpers")
 router.post("/login", adminController.loginAdmin)
 router.post("/profile/edit/:id", [verifyToken,verifyTokenWithId, allowedAdmin], adminController.editProfileAdmin)
 router.get("/profile/:id", [verifyToken,verifyTokenWithId, allowedAdmin], adminController.viewProfileAdmin)
+router.get("/", allowedAdmin, (req,res)=>{res.send('hello')})
 
 
 module.exports = router

@@ -4,7 +4,6 @@ const {generateToken, dataToken} = require("../helpers")
 
 class AdminController { 
     static async loginAdmin(req, res) {
-        
         try {
             let {email, password} = req.body
             const existAdmin = await AdminModel.findOne({email: email})
@@ -15,12 +14,13 @@ class AdminController {
                         _id: existAdmin._id,
                         role: "admin"
                     }
-                    console.log(tokenAdmin)
                     const createToken = generateToken(tokenAdmin)
                     res.status(200).send({message: "welcome", token: createToken})
                 }else{
                     res.send('invalid')
                 }
+            }else{
+                res.send('admin not exist')
             }  
         } catch (error) {
             res.status(500).send({err: error})
