@@ -41,7 +41,7 @@ class HistoryController {
                     }
                 }
             }else{
-
+                res.status(500).send('invalid')
             }
             
         } catch (error) {
