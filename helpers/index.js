@@ -14,11 +14,11 @@ const verifyToken = (req,res,next)=>{
         const verify = jwt.verify(token.split(" ")[1], secretkey);
         if(verify){
             next()
+        }else{
+            console.log('token error')
         }
     } catch (error) {
-        return res.status(401).send({
-            error: error
-        });
+        console.log(error)
     }   
 }
 const dataToken = (req,res)=>{
@@ -36,20 +36,51 @@ const verifyTokenWithId = (req,res,next)=>{
         const id = req.params.id
         const verify = jwt.verify(token.split(" ")[1], secretkey);
         if(verify.data._id === id){
+            res.send({data: verify, id: id})
             next()
         }else{
-            res.status(404).send('forbidden')
+            console.log('forbidden')
 
         }
     } catch(error){
-        return res.status(404).send({
-            error: error
-        });
+        console.log(error)
     }   
 }
+const allowedAdmin = (req,res,next)=>{
+    try {
+        const token = req.headers.authorization
+        const verify = jwt.verify(token.split(" ")[1], secretkey);
+        if(verify.data.role === "admin"){
+            next()
+        }else{
+            console.log('forbidden user')
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+const allowedUser = (req,res,next)=>{
+    try {
+        const token = req.headers.authorization
+        const verify = jwt.verify(token.split(" ")[1], secretkey);
+        if(verify.data.role === "user"){
+            next()
+        }else{
+            console.log('forbidden admin')
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+
 module.exports = {
     generateToken : generateToken,
     verifyToken: verifyToken,
     verifyTokenWithId: verifyTokenWithId,
-    dataToken: dataToken    
+    dataToken: dataToken,
+    allowedAdmin: allowedAdmin,
+    allowedUser: allowedUser    
 }
