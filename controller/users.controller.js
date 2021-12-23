@@ -26,12 +26,14 @@ class UsersController {
         try {
             let {email, password} = req.body
             const existUser = await UsersModel.findOne({email: email})
-            console.log(existUser)
             if(existUser !== null){
                 let compare = bcrypt.compareSync(password, existUser.password)
-                console.log(compare)
                 if(compare){
-                    const createToken = generateToken(existUser)
+                    const tokenUser = {
+                        _id: existUser._id,
+                        role: "user"
+                    }
+                    const createToken = generateToken(tokenUser)
                     res.status(200).send({message: "welcome", token: createToken})
                 }else{
                     res.send('invalid')

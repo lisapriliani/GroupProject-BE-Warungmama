@@ -10,7 +10,11 @@ class UsersController {
             if(existAdmin !== null){
                 let compare = bcrypt.compareSync(password, existAdmin.password)
                 if(compare){
-                    const createToken = generateToken(existAdmin)
+                    const tokenAdmin = {
+                        _id: existUser._id,
+                        role: "admin"
+                    }
+                    const createToken = generateToken(tokenAdmin)
                     res.status(200).send({message: "welcome", token: createToken})
                 }else{
                     res.send('invalid')
