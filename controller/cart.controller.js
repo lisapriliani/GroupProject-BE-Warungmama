@@ -1,35 +1,17 @@
 
 const { dataToken } = require("../helpers")
 const CartModel = require("../models/cart.model")
+const HistoryModel = require("../models/history.model")
+const TransactionModel = require("../models/transaction.model")
 const UserModel = require("../models/users.model")
-
-/* exports.getAll = async (req, res) => {
-  try {
-    // get id usernya dari session untuk mengambil keranjang yang hanya dimiliki user tersebut
-    const owner = req.user._id
-    const cart = await CartModel.find({userID: owner}).populate("produk")
-    if(cart){
-      // hitung total price per item
-      
-      // hitung total price all item
-      
-      res.send({cart: cart})
-    } else {
-      res.send({message: "You don't have product on your cart, let's go shopping"})
-    }
-  } catch (error) {
-    res.send({message: error})
-  }
-  
-} */
 
 exports.getAll = async (req, res) => {
   const {data} = dataToken(req, res)
 
   try {
-    const role = req.role || null
+    const role = data.role || null
     
-    if(role === 'admin' || role === 'superadmin') {
+    if(role === 'admin') {
       const cart = await CartModel.find().populate({
         path: "produk",
         populate: {
@@ -59,12 +41,6 @@ exports.getAll = async (req, res) => {
 // only admin
 exports.getCartByUser = async (req, res) => {
   try {
-    // const role = req.role || null
-    
-    // if(role !== 'admin' || role !== 'superadmin') {
-    //   return res.sendStatus(403)
-    // }
-
     const userID = req.params.userID
     const cart = await CartModel.findOne({userID: userID}).populate({
       path: "produk",
@@ -85,7 +61,6 @@ exports.addCart = async (req, res) => {
   const {data} = dataToken(req, res)
 
   try {
-    // const userID = req.user._id
     const userID = data._id
     const {productID} = req.body
 
@@ -186,7 +161,7 @@ exports.removeItem = async (req, res) => {
       cart: cart
     })
   } catch (error) {
-    
+    res.status(500).send({error: error})
   }
 }
 
@@ -194,10 +169,96 @@ exports.checkout = async (req, res) => {
   const {data} = dataToken(req, res)
   const userID = data._id
 
-  const {selectedProducts} = req.body
+  const {selectedProducts, alamat, metodePengambilan, metodePembayaran} = req.body
 
-  let cart = await CartModel.findOne({userID: userID})
-  let checkoutProducts = selectedProducts.map(select => cart.produk.filter(p => p.productID == select))
+  let cart = await CartModel.findOne({userID: userID}).populate({
+    path: "produk",
+    populate: {
+      path: "productID",
+      select: {harga: 1}
+    }
+  })
+  
+  let checkoutProducts = cart.produk.filter(p => {
+    return selectedProducts.find(element => element == p.productID._id)
+  })
+  
+  if(checkoutProducts.length === 0)
+  return res.sendStatus(400)
+  
+  
+  let produk = checkoutProducts.map(p => {
+    let item = {}
+    item.productID = p.productID._id
+    item.qty = p.qty
+    item.itemPrice = p.productID.harga * p.qty
+    
+    return item
+  })
+  
+  let totalOngkir = 0
+  if(metodePengambilan === 'delivery')
+  totalOngkir = 10000
+  
+  let totalPrice = produk.reduce((prev, curr) => {return prev + curr.itemPrice}, 0)
 
-  res.send(checkoutProducts)
+  let transaction = {
+    keranjangID: cart._id,
+    produk: produk,
+    alamat: alamat || null,
+    metodePengambilan: metodePengambilan,
+    totalOngkir: totalOngkir,
+    totalPrice: totalPrice,
+    metodePembayaran: metodePembayaran
+  }
+
+  let saved = null
+  const transactionCollection = await TransactionModel.findOne({keranjangID: cart._id})
+  if(transactionCollection){
+    await transactionCollection.update(transaction)
+    saved = transaction
+  }
+  else {
+    const newTransaction = new TransactionModel(transaction)
+    saved = await newTransaction.save()
+  }
+  
+  res.send(saved)
+}
+
+exports.order = async (req, res) => {
+  const {data} = dataToken(req, res)
+  
+  let cart = await CartModel.findOne({userID: data._id})
+  let transaction = await TransactionModel.findOne({keranjangID: cart._id})
+
+  let deleteProduct = []
+
+  if(transaction) {
+    transaction.produk.map(t => deleteProduct.push(t.productID.toString()))
+
+    cart = cart.produk.filter(p => {
+      return deleteProduct.find(element => element != p.productID)
+    })
+
+    let statusPembayaran = transaction.metodePembayaran === 'COD' ? 'Belum bayar' : 'Sudah bayar'
+
+    const order = {
+      userId: data._id,
+      produk: transaction.produk,
+      alamat: transaction.alamat,
+      metodePembayaran: transaction.metodePembayaran,
+      statusPembayaran: statusPembayaran,
+      metodePengambilan: transaction.metodePengambilan
+    }
+
+    const saved = await new HistoryModel(order).save()
+    await CartModel.findOne({userID: data._id}).updateOne({produk: cart})
+    await TransactionModel.deleteOne({_id: transaction._id})
+    
+    res.send(saved)
+  } else {
+    return res.sendStatus(400)
+  }
+  
 }

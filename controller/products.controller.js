@@ -22,12 +22,6 @@ exports.getByID = async (req, res) => {
 
 exports.add = async (req, res) => {
   try {
-    /* const role = req.role
-    
-    if(role !== 'admin' || role !== 'superadmin') {
-      return res.sendStatus(403)
-    } */
-    
     const newProduct = req.body
     const product = new ProductModel(newProduct)
     await product.save()
@@ -42,12 +36,6 @@ exports.add = async (req, res) => {
 
 exports.update = async (req, res) => {
   try {
-    /* const role = req.role
-
-    if(role !== 'admin' || role !== 'superadmin') {
-      return res.sendStatus(403)
-    } */
-    
     const ID = req.params.id
     const updateProduct = req.body
     
@@ -61,11 +49,6 @@ exports.update = async (req, res) => {
 
 exports.delete = async (req, res) => {
   try {
-    /* const role = req.role
-    
-    if(role !== 'admin' || role !== 'superadmin') {
-      return res.sendStatus(403)
-    } */
     const ID = req.params.id
 
     await ProductModel.deleteOne({_id: ID})

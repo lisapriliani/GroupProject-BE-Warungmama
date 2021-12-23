@@ -14,7 +14,7 @@ const ProdukSchema = new mongoose.Schema({
 const CartSchema = new mongoose.Schema({
   userID: {
     type: mongoose.Types.ObjectId,
-    // ref: 'User',
+    ref: 'User',
     required: true
   },
   produk: [ProdukSchema]
