@@ -1,5 +1,6 @@
 const res = require("express/lib/response");
 const WishlistModel = require("../models/wishlist");
+
 const { dataToken } = require("../helpers");
 
 class wishlistcontroller {
