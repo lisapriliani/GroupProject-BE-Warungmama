@@ -8,9 +8,10 @@ const { verifyToken, allowedUser, allowedAdmin } = require("../helpers")
 router.get("/", verifyToken, CartController.getAll)
 router.get("/:userID", [verifyToken, allowedAdmin], CartController.getCartByUser)
 router.post("/", [verifyToken, allowedUser], CartController.addCart)
-router.put("/reduceQty/:productID", [verifyToken, allowedUser], CartController.reduceQty)
+router.patch("/reduceQty/:productID", [verifyToken, allowedUser], CartController.reduceQty)
 router.delete("/", [verifyToken, allowedUser], CartController.emptyCart)
 router.delete("/removeItem/:productID", [verifyToken, allowedUser], CartController.removeItem)
 router.post("/checkout", [verifyToken, allowedUser], CartController.checkout)
+router.post("/order", [verifyToken, allowedUser], CartController.order)
 
 module.exports = router
