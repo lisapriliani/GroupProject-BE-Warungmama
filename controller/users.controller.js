@@ -59,6 +59,7 @@ class UsersController {
         try {
             const id = req.params.id
             let {nama, email, password} = req.body
+            password = bcrypt.hashSync(password, saltRounds)
             const filter = {_id: id}
             const update = {nama: nama, email:email, password:password}
             await UsersModel.findOneAndUpdate(filter, update)
