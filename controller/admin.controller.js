@@ -1,5 +1,6 @@
 const AdminModel = require("../models/admin.model")
 const bcrypt = require("bcrypt")
+const saltRounds = 10
 const {generateToken, dataToken} = require("../helpers")
 
 class AdminController { 
@@ -38,6 +39,7 @@ class AdminController {
         try {
             const id = req.params.id
             let {nama, email, password} = req.body
+            password = bcrypt.hashSync(password, saltRounds)
             const filter = {_id: id}
             const update = {nama: nama, email:email, password:password}
             const admin = await AdminModel.findOneAndUpdate(filter, update)
